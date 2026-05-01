@@ -1,25 +1,23 @@
 # DeskUp Pro Lovelace Card
 
-A custom **Home Assistant Lovelace card** for controlling a **DeskUp Pro RJ12 standing desk** via ESPHome.
+A Home Assistant Lovelace card for controlling a DeskUp Pro RJ12 standing desk via ESPHome.
 
 This card pairs with the DeskUp Pro ESPHome controller and provides a clean, configurable UI with a full visual editor.
 
----
+[![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Hyperion5088&repository=deskup-pro-card&category=plugin)
 
-## ✨ Features
+## Features
 
 - Preset buttons (M1–M4)
-- Manual **Up / Down / Stop** controls
+- Manual Up / Down / Stop controls
 - Height slider (control or feedback-only)
 - Current height & percentage display
 - Preset names from YAML or ESPHome text entities
-- One-click **Sync preset names to device**
-- Full Lovelace **visual editor**
+- One-click Sync preset names to device
+- Full Lovelace visual editor
 - Theme-friendly and card-mod compatible
 
----
-
-## 🙏 Credits & Acknowledgements
+## Credits
 
 This project builds on the excellent ESPHome work from:
 
@@ -30,39 +28,45 @@ https://github.com/SmartHomeGuys/DeskUp-Pro-Controller-RJ12
 All credit for the ESP32 desk controller belongs to that project.  
 This card provides an enhanced Home Assistant UI on top.
 
----
-
-## 🧩 Requirements
+## Requirements
 
 - Home Assistant
 - ESPHome
 - DeskUp Pro desk (RJ12)
 - ESP32 flashed with firmware from the repo above
 
----
+## Installation
 
-## 📦 Installation
+### HACS
 
-### 1. Install the card
+1. Use the button above, or add this repository to HACS manually:
+   - Repository: `https://github.com/Hyperion5088/deskup-pro-card`
+   - Category: `Dashboard`
+2. Install `DeskUp Pro Card` from HACS.
+3. Refresh the browser after HACS adds the dashboard resource.
 
-Copy `deskup-pro-card.js` to:
+HACS serves the card from:
 
+```text
+/hacsfiles/deskup-pro-card/deskup-pro-card.js
 ```
-/config/www/deskup-pro-card.js
+
+The custom card type is:
+
+```yaml
+type: custom:deskup-pro-card
 ```
 
-### 2. Add as a Lovelace resource
+### Manual
+
+Copy `deskup-pro-card.js` to your Home Assistant `www` directory and add it as a dashboard resource:
 
 ```yaml
 url: /local/deskup-pro-card.js
 type: module
 ```
 
-Reload Lovelace or restart Home Assistant.
-
----
-
-## 🛠 ESPHome Preset Name Text Entities
+## ESPHome Preset Name Text Entities
 
 To enable syncing preset names between the card and the device, create an ESPHome include file.
 
@@ -107,7 +111,7 @@ When these entities exist:
 
 ---
 
-## 🧱 Card Configuration
+## Card Configuration
 
 ### Required
 
