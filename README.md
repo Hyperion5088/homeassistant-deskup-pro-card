@@ -48,7 +48,7 @@ This card provides an enhanced Home Assistant UI on top.
 HACS serves the card from:
 
 ```text
-/hacsfiles/deskup-pro-card/deskup-pro-card.js
+/hacsfiles/homeassistant-deskup-pro-card/deskup-pro-card.js
 ```
 
 The custom card type is:
