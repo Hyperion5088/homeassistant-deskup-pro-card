@@ -10,6 +10,11 @@ const STATUS_DOWN = "Lowering";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const deskPrefixFromHeightEntity = (entityId) => {
+  const match = String(entityId || "").match(/^sensor\.(.+)_desk_height$/);
+  return match ? match[1] : "";
+};
+
 /* =========================================================
    VISUAL EDITOR (STABLE + MERGED CONFIG)
    ========================================================= */
@@ -23,6 +28,7 @@ setConfig(config) {
   this._config = {
     type: `custom:${CARD_NAME}`,
     title: "",
+    height_entity: "",
     device: "",
     tolerance_mm: 8,
     show_presets: true,
@@ -38,6 +44,12 @@ setConfig(config) {
     this._rendered = true;
   }
 }
+
+  set hass(hass) {
+    this._hass = hass;
+    if (this._rendered) this._configureEntityPicker();
+  }
+
   _emit(patch = {}) {
     this._config = { ...this._config, ...patch };
     this.dispatchEvent(
@@ -56,7 +68,8 @@ setConfig(config) {
       <div style="padding:12px;display:flex;flex-direction:column;gap:14px;">
 
         <ha-textfield id="title" label="Card title (optional)"></ha-textfield>
-        <ha-textfield id="device" label="Device name"></ha-textfield>
+        <ha-entity-picker id="height_entity" label="Desk height sensor"></ha-entity-picker>
+        <ha-textfield id="device" label="Device prefix (advanced fallback)"></ha-textfield>
         <ha-textfield id="tolerance" label="Preset match tolerance (mm)" type="number"></ha-textfield>
 
         <div style="font-weight:600;opacity:0.85;margin-top:4px;">Preset labels</div>
@@ -93,7 +106,8 @@ setConfig(config) {
         </ha-formfield>
 
         <div style="font-size:12px;opacity:0.7;line-height:1.4;">
-          Preset labels are stored in this card's YAML config. Leave blank to use <b>M1–M4</b> defaults.<br>
+          Select the desk height sensor when possible. The card derives the ESPHome device prefix from <code>sensor.&lt;device&gt;_desk_height</code>.<br>
+          Preset labels are stored in this card's YAML config. Leave blank to use <b>M1-M4</b> defaults.<br>
           If you've created ESPHome text entities, you can use the card's <b>Sync preset names to device</b> button to copy these labels to:<br>
           <code>text.&lt;device&gt;_preset_m1_name</code>,
           <code>text.&lt;device&gt;_preset_m2_name</code>,
@@ -107,6 +121,7 @@ setConfig(config) {
     const q = (s) => this.querySelector(s);
 
     q("#title").value = c.title ?? "";
+    q("#height_entity").value = c.height_entity ?? "";
     q("#device").value = c.device ?? "";
     q("#tolerance").value = String(c.tolerance_mm ?? 8);
 
@@ -124,7 +139,18 @@ setConfig(config) {
     q("#slider-control-wrap").style.display =
       q("#show_slider").checked ? "block" : "none";
 
+    this._configureEntityPicker();
+
     q("#title").addEventListener("input", (e) => this._emit({ title: e.target.value }));
+    q("#height_entity").addEventListener("value-changed", (e) => {
+      const heightEntity = e.detail?.value || "";
+      const prefix = deskPrefixFromHeightEntity(heightEntity);
+      this._emit({
+        height_entity: heightEntity,
+        ...(prefix ? { device: prefix } : {}),
+      });
+      if (prefix) q("#device").value = prefix;
+    });
     q("#device").addEventListener("input", (e) => this._emit({ device: e.target.value }));
     q("#tolerance").addEventListener("input", (e) =>
       this._emit({ tolerance_mm: Number(e.target.value) })
@@ -161,6 +187,15 @@ setConfig(config) {
     ["#show_presets", "#show_manual", "#show_slider", "#slider_control", "#show_position"]
       .forEach((id) => q(id).addEventListener("change", emitSwitches));
   }
+
+  _configureEntityPicker() {
+    const picker = this.querySelector("#height_entity");
+    if (!picker || !this._hass) return;
+
+    picker.hass = this._hass;
+    picker.includeDomains = ["sensor"];
+    picker.value = this._config?.height_entity || "";
+  }
 }
 
 
@@ -183,6 +218,7 @@ class DeskUpProCard extends HTMLElement {
     return {
       type: `custom:${CARD_NAME}`,
       title: "",
+      height_entity: "",
       device: "",
       tolerance_mm: 8,
       show_presets: true,
@@ -197,6 +233,7 @@ class DeskUpProCard extends HTMLElement {
   setConfig(config) {
     this._config = {
       title: "",
+      height_entity: "",
       device: "",
       tolerance_mm: 8,
       show_presets: true,
@@ -218,11 +255,11 @@ class DeskUpProCard extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
 
-    if (!this._config?.device) {
+    if (!this._dev()) {
       this.innerHTML = `
         <ha-card>
           <div style="padding:16px;color:var(--error-color);font-weight:700;">
-            DeskUp Pro Card: <code>device</code> is required
+            DeskUp Pro Card: select a desk height sensor in the visual editor
           </div>
         </ha-card>
       `;
@@ -243,7 +280,9 @@ class DeskUpProCard extends HTMLElement {
     const c = this._config || {};
     return [
       (c.title ?? "").trim(),
+      (c.height_entity ?? "").trim(),
       (c.device ?? "").trim(),
+      this._dev(),
       Number(c.tolerance_mm ?? 8),
       !!c.slider_control,
       !!c.show_presets,
@@ -273,7 +312,29 @@ class DeskUpProCard extends HTMLElement {
     return true; // all match
   }
   _dev() {
-    return (this._config?.device ?? "").trim();
+    return (
+      (this._config?.device ?? "").trim() ||
+      deskPrefixFromHeightEntity(this._config?.height_entity) ||
+      this._autoDetectedDevice()
+    );
+  }
+
+  _autoDetectedDevice() {
+    if (!this._hass?.states) return "";
+
+    const prefixes = Object.keys(this._hass.states)
+      .map((entityId) => deskPrefixFromHeightEntity(entityId))
+      .filter((prefix) => {
+        if (!prefix) return false;
+        return (
+          this._hass.states[`button.${prefix}_desk_stop`] ||
+          this._hass.states[`number.${prefix}_desk_height`] ||
+          this._hass.states[`cover.${prefix}_height_slider`]
+        );
+      });
+
+    const unique = [...new Set(prefixes)];
+    return unique.length === 1 ? unique[0] : "";
   }
 
   _entity(domain, suffix) {

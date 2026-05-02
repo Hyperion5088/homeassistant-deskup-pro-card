@@ -113,20 +113,24 @@ When these entities exist:
 
 ## Card Configuration
 
-### Required
+Most options are configurable via the visual editor. Add the card, then select your Desk height sensor.
+
+The card derives the ESPHome device prefix from height sensors named like:
 
 ```yaml
-device: office_esp32_s3_01
+sensor.your_desk_controller_desk_height
 ```
 
-The `device` value must match the ESPHome node name used in entity IDs.
+For non-standard entity names, set `device` manually as an advanced fallback. The `device` value must match the ESPHome node name used in entity IDs.
 
 ### Example
 
 ```yaml
 type: custom:deskup-pro-card
 title: Standing Desk
-device: office_esp32_s3_01
+height_entity: sensor.your_desk_controller_desk_height
+# Optional fallback for non-standard entity names:
+# device: your_desk_controller
 presets:
   m1: Sitting
   m2: Standing
