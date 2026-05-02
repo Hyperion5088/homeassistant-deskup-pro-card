@@ -4,7 +4,7 @@ A Home Assistant Lovelace card for controlling a DeskUp Pro RJ12 standing desk v
 
 This card pairs with the DeskUp Pro ESPHome controller and provides a clean, configurable UI with a full visual editor.
 
-[![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Hyperion5088&repository=deskup-pro-card&category=plugin)
+[![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Hyperion5088&repository=homeassistant-deskup-pro-card&category=plugin)
 
 ## Features
 
@@ -40,7 +40,7 @@ This card provides an enhanced Home Assistant UI on top.
 ### HACS
 
 1. Use the button above, or add this repository to HACS manually:
-   - Repository: `https://github.com/Hyperion5088/deskup-pro-card`
+   - Repository: `https://github.com/Hyperion5088/homeassistant-deskup-pro-card`
    - Category: `Dashboard`
 2. Install `DeskUp Pro Card` from HACS.
 3. Refresh the browser after HACS adds the dashboard resource.
