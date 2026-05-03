@@ -2,6 +2,8 @@
 
 A Home Assistant Lovelace card for controlling a DeskUp Pro RJ12 standing desk via ESPHome.
 
+Status: beta. This card is usable for testing, but visual editor options and entity assumptions may still change before a stable release.
+
 This card pairs with the DeskUp Pro ESPHome controller and provides a clean, configurable UI with a full visual editor.
 
 [![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Hyperion5088&repository=homeassistant-deskup-pro-card&category=plugin)
