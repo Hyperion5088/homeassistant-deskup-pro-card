@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card for controlling a DeskUp Pro RJ12 standing desk via ESPHome.
 
-Status: beta. This card is usable for testing, but visual editor options and entity assumptions may still change before a stable release.
+Status: stable. This card is no longer in beta.
 
 This card pairs with the DeskUp Pro ESPHome controller and provides a clean, configurable UI with a full visual editor.
 
